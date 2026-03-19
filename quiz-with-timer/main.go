@@ -25,7 +25,7 @@ func main() {
 	data, err := os.ReadFile(filepath.Join("quiz.csv"))
 
 	if err != nil {
-		log.Fatalf("Error while reding the csv file %v", err)
+		log.Fatalf("error while reading the csv file: %v", err)
 	}
 
 	csvReader := csv.NewReader(bytes.NewReader(data))
@@ -39,14 +39,14 @@ func main() {
 	reader := bufio.NewReader(os.Stdin)
 	answers := make([]Answer, 0, len(records)-1)
 	fmt.Println("Quiz\n====")
-	fmt.Println("You have 30 seconds to answer all questions\n=============================================")
+	fmt.Println("You have 30 seconds to answer all questions\n=============================================\n ")
 
-	timer := time.NewTimer(5 * time.Second)
+	timer := time.NewTimer(30 * time.Second)
 	defer timer.Stop()
 quizLoop:
 	for _, record := range records[1:] {
 
-		fmt.Printf("\nProblem %s: %s\nAnswer = ", record[0], record[1])
+		fmt.Printf("\033[1A\r\033[2KProblem %s: %s :\tAnswer = ", record[0], record[1])
 
 		inputChannel := make(chan string, 1)
 
@@ -61,7 +61,7 @@ quizLoop:
 
 		select {
 		case <-timer.C:
-			fmt.Println("\n\n*********** Times is Up! Better luck next time***********")
+			fmt.Println("\n\n*********** Time is up! Better luck next time. ***********")
 			break quizLoop
 		case input := <-inputChannel:
 			var ans int
@@ -81,7 +81,7 @@ quizLoop:
 	}
 
 	score := 0
-	fmt.Println("Your Anwers\n===========")
+	fmt.Println("Your Answers\n============")
 	if len(answers) == 0 {
 		fmt.Println("No answers provided")
 	} else {

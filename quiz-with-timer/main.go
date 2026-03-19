@@ -8,21 +8,20 @@ import (
 	"log"
 	"os"
 	"path/filepath"
-	"strconv"
 	"strings"
 	"time"
 )
 
 type Answer struct {
 	No     string
-	Ans    int
+	Ans    string
 	Score  int
 	Result string
 }
 
 func main() {
 
-	data, err := os.ReadFile(filepath.Join("quiz.csv"))
+	data, err := os.ReadFile(filepath.Join("quiz-with-timer/quiz.csv"))
 
 	if err != nil {
 		log.Fatalf("error while reading the csv file: %v", err)
@@ -64,16 +63,12 @@ quizLoop:
 			fmt.Println("\n\n*********** Time is up! Better luck next time. ***********")
 			break quizLoop
 		case input := <-inputChannel:
-			var ans int
 			input = strings.TrimSpace(input)
 			if input != "" {
-				ans, _ = strconv.Atoi(input)
-
-				correct_answer, _ := strconv.Atoi(record[2])
-				if ans != correct_answer {
-					answers = append(answers, Answer{record[0], ans, 0, "Wrong"})
+				if input != record[2] {
+					answers = append(answers, Answer{record[0], input, 0, "Wrong"})
 				} else {
-					answers = append(answers, Answer{record[0], ans, 10, "Correct"})
+					answers = append(answers, Answer{record[0], input, 10, "Correct"})
 				}
 			}
 		}
@@ -87,7 +82,7 @@ quizLoop:
 	} else {
 		for _, ans := range answers {
 			score += ans.Score
-			fmt.Printf("\n%s: Your answer: %d, Score: %d, Result: %s", ans.No, ans.Ans, ans.Score, ans.Result)
+			fmt.Printf("\n%s: Your answer: %s, Score: %d, Result: %s", ans.No, ans.Ans, ans.Score, ans.Result)
 		}
 	}
 
